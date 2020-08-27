@@ -44,18 +44,22 @@ function calculateCredits(invoice, plays, result) {
     let volumeCredits = calculateVolumeCredits(invoice, plays);
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
-        let thisAmount = 0;
-        thisAmount = switchPlayType(play, thisAmount, perf);
+        let thisAmount = calculateThisAmount(invoice, plays,perf);
         result += ` ${play.name}: ${usdFormat(thisAmount)} (${perf.audience} seats)\n`;
     }
     return {volumeCredits, result, totalAmount};
 }
 
+function calculateThisAmount(invoice, plays,perf) {
+    let thisAmount = 0;
+    thisAmount = switchPlayType(plays[perf.playID], thisAmount, perf);
+    return thisAmount;
+}
+
 function calculateTotalAmount(invoice, plays) {
     let totalAmount = 0;
     for (let perf of invoice.performances) {
-        let thisAmount = 0;
-        thisAmount = switchPlayType(plays[perf.playID], thisAmount, perf);
+        let thisAmount = calculateThisAmount(invoice, plays,perf)
         totalAmount += thisAmount;
     }
     return totalAmount;
