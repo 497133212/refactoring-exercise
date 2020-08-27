@@ -41,7 +41,7 @@ function usdFomfat() {
     return format;
 }
 
-function statement(invoice, plays) {
+function printResult(invoice, plays) {
     let totalAmount = 0;
     let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
@@ -62,6 +62,10 @@ function statement(invoice, plays) {
     result += `Amount owed is ${format(totalAmount / 100)}\n`;
     result += `You earned ${volumeCredits} credits \n`;
     return result;
+}
+
+function statement(invoice, plays) {
+    return printResult(invoice, plays);
 }
 
 module.exports = {
