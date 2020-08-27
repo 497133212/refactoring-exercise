@@ -1,30 +1,30 @@
 const COMEDY = 'comedy';
 const TRAGEDY = 'tragedy';
 
-function calculateTragedyThisAmount(thisAmount, perf) {
+function calculateTragedyThisAmount(thisAmount, audience) {
     thisAmount = 40000;
-    if (perf.audience > 30) {
-        thisAmount += 1000 * (perf.audience - 30);
+    if (audience > 30) {
+        thisAmount += 1000 * (audience - 30);
     }
     return thisAmount;
 }
 
-function calculateComedyThisAmount(thisAmount, perf) {
+function calculateComedyThisAmount(thisAmount, audience) {
     thisAmount = 30000;
-    if (perf.audience > 20) {
-        thisAmount += 10000 + 500 * (perf.audience - 20);
+    if (audience > 20) {
+        thisAmount += 10000 + 500 * (audience - 20);
     }
-    thisAmount += 300 * perf.audience;
+    thisAmount += 300 * audience;
     return thisAmount;
 }
 
 function switchPlayType(play, thisAmount, perf) {
     switch (play.type) {
         case TRAGEDY:
-            thisAmount = calculateTragedyThisAmount(thisAmount, perf);
+            thisAmount = calculateTragedyThisAmount(thisAmount, perf.audience);
             break;
         case COMEDY:
-            thisAmount = calculateComedyThisAmount(thisAmount, perf);
+            thisAmount = calculateComedyThisAmount(thisAmount, perf.audience);
             break;
         default:
             throw new Error(`unknown type: ${play.type}`);
