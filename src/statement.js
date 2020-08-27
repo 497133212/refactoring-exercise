@@ -40,24 +40,32 @@ function usdFormat(thisAmount) {
 
 
 function calculateCredits(invoice, plays, result) {
-    let totalAmount = 0;
+    let totalAmount = calculateTotalAmount(invoice, plays);
     let volumeCredits = calculateVolumeCredits(invoice, plays);
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
         let thisAmount = 0;
         thisAmount = switchPlayType(play, thisAmount, perf);
         result += ` ${play.name}: ${usdFormat(thisAmount)} (${perf.audience} seats)\n`;
-        totalAmount += thisAmount;
     }
     return {volumeCredits, result, totalAmount};
+}
+
+function calculateTotalAmount(invoice, plays) {
+    let totalAmount = 0;
+    for (let perf of invoice.performances) {
+        let thisAmount = 0;
+        thisAmount = switchPlayType(plays[perf.playID], thisAmount, perf);
+        totalAmount += thisAmount;
+    }
+    return totalAmount;
 }
 
 function calculateVolumeCredits(invoice, plays) {
     let volumeCredits = 0;
     for (let perf of invoice.performances) {
-        const play = plays[perf.playID];
         volumeCredits += Math.max(perf.audience - 30, 0);
-        if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5);
+        if ('comedy' === plays[perf.playID].type) volumeCredits += Math.floor(perf.audience / 5);
     }
     return volumeCredits;
 }
