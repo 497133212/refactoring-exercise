@@ -38,19 +38,7 @@ function usdFormat(thisAmount) {
 }
 
 
-
-function calculateCredits(invoice, plays, result) {
-    let totalAmount = calculateTotalAmount(invoice, plays);
-    let volumeCredits = calculateVolumeCredits(invoice, plays);
-    // for (let perf of invoice.performances) {
-    //     const play = plays[perf.playID];
-    //     let thisAmount = calculateThisAmount(invoice, plays,perf);
-    //     result += ` ${play.name}: ${usdFormat(thisAmount)} (${perf.audience} seats)\n`;
-    // }
-    return {volumeCredits, result, totalAmount};
-}
-
-function calculateThisAmount(invoice, plays,perf) {
+function calculateThisAmount(invoice, plays, perf) {
     let thisAmount = 0;
     thisAmount = switchPlayType(plays[perf.playID], thisAmount, perf);
     return thisAmount;
@@ -59,7 +47,7 @@ function calculateThisAmount(invoice, plays,perf) {
 function calculateTotalAmount(invoice, plays) {
     let totalAmount = 0;
     for (let perf of invoice.performances) {
-        let thisAmount = calculateThisAmount(invoice, plays,perf)
+        let thisAmount = calculateThisAmount(invoice, plays, perf)
         totalAmount += thisAmount;
     }
     return totalAmount;
@@ -74,24 +62,33 @@ function calculateVolumeCredits(invoice, plays) {
     return volumeCredits;
 }
 
-
-function printResult(invoice, plays) {
-    let result = `Statement for ${invoice.customer}\n`;
-    const data = calculateCredits(invoice, plays, result);
+function createStatementData(invoice, plays) {
+    let data = {};
+    data.customer = invoice.customer;
     for (let perf of invoice.performances) {
-        const play = plays[perf.playID];
-        let thisAmount = calculateThisAmount(invoice, plays,perf);
-        result += ` ${play.name}: ${usdFormat(thisAmount)} (${perf.audience} seats)\n`;
-    };
+        perf.play = plays[perf.playID];
+        perf.amount = calculateThisAmount(invoice, plays, perf);
+    }
+    data.performances = invoice.performances;
+    data.totalAmount = calculateTotalAmount(invoice, plays);
+    data.totalVolumeCreadits = calculateVolumeCredits(invoice, plays);
+    return data;
+}
+
+function printResult(data) {
+    let result = `Statement for ${data.customer}\n`;
+    for (let perf of data.performances) {
+        result += ` ${perf.play.name}: ${usdFormat(perf.amount)} (${perf.audience} seats)\n`;
+    }
     result += `Amount owed is ${usdFormat(data.totalAmount)}\n`;
-    result += `You earned ${data.volumeCredits} credits \n`;
+    result += `You earned ${data.totalVolumeCreadits} credits \n`;
     return result;
 }
 
 function statement(invoice, plays) {
-    return printResult(invoice, plays);
+    return printResult(createStatementData(invoice, plays));
 }
 
 module.exports = {
-    statement,
+    statement
 };
