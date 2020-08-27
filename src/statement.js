@@ -41,7 +41,9 @@ function usdFomfat() {
     return format;
 }
 
-function calculateCredits(invoice, plays, volumeCredits, result, format, totalAmount) {
+function calculateCredits(invoice, plays, result, format) {
+    let totalAmount = 0;
+    let volumeCredits = 0;
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
         let thisAmount = 0;
@@ -59,11 +61,9 @@ function calculateCredits(invoice, plays, volumeCredits, result, format, totalAm
 }
 
 function printResult(invoice, plays) {
-    let totalAmount = 0;
-    let volumeCredits = 0;
     let result = `Statement for ${invoice.customer}\n`;
     const format = usdFomfat();
-    const ret = calculateCredits(invoice, plays, volumeCredits, result, format, totalAmount);
+    const ret = calculateCredits(invoice, plays, result, format);
     ret.result += `Amount owed is ${format(ret.totalAmount / 100)}\n`;
     ret.result += `You earned ${ret.volumeCredits} credits \n`;
     return ret.result;
