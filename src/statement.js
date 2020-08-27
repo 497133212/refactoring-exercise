@@ -29,15 +29,20 @@ function switchPlayType(play, thisAmount, perf) {
     return thisAmount;
 }
 
-function statement(invoice, plays) {
-    let totalAmount = 0;
-    let volumeCredits = 0;
-    let result = `Statement for ${invoice.customer}\n`;
+function usdFomfat() {
     const format = new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 2,
     }).format;
+    return format;
+}
+
+function statement(invoice, plays) {
+    let totalAmount = 0;
+    let volumeCredits = 0;
+    let result = `Statement for ${invoice.customer}\n`;
+    const format = usdFomfat();
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
         let thisAmount = 0;
