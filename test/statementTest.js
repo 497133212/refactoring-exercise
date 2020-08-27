@@ -162,6 +162,38 @@ test('statement case 7. Customer BigCo has one unknown performance. ', t => {
   }
 });
 
+test('statement case 6. Customer BigCo has three performances. ' +
+    'Hamlet has 55 audiences. ' +
+    'As You Like Is has 35 audiences. ' +
+    'Othello has 40 audiences. ', t => {
+
+  const invoice = {
+    'customer': 'BigCo',
+    'performances': [
+      {
+        'playID': 'hamlet',
+        'audience': 55,
+      },
+      {
+        'playID': 'as-like',
+        'audience': 35,
+      },
+      {
+        'playID': 'othello',
+        'audience': 40,
+      },
+    ],
+  };
+
+  const result = statement(invoice, plays);
+
+  t.is(result, 'Statement for BigCo\n' +
+      ' Hamlet: $650.00 (55 seats)\n' +
+      ' As You Like It: $580.00 (35 seats)\n' +
+      ' Othello: $500.00 (40 seats)\n' +
+      'Amount owed is $1,730.00\n' +
+      'You earned 47 credits \n');
+});
 
 // t.is(result, '<h1>Statement for BigCo</h1>\n' +
 //     '<table>\n' +

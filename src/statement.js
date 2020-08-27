@@ -1,6 +1,3 @@
-const COMEDY = 'comedy';
-const TRAGEDY = 'tragedy';
-
 function calculateTragedyThisAmount(thisAmount, audience) {
     thisAmount = 40000;
     if (audience > 30) {
@@ -20,10 +17,10 @@ function calculateComedyThisAmount(thisAmount, audience) {
 
 function switchPlayType(play, thisAmount, perf) {
     switch (play.type) {
-        case TRAGEDY:
+        case 'tragedy':
             thisAmount = calculateTragedyThisAmount(thisAmount, perf.audience);
             break;
-        case COMEDY:
+        case 'comedy':
             thisAmount = calculateComedyThisAmount(thisAmount, perf.audience);
             break;
         default:
@@ -32,39 +29,44 @@ function switchPlayType(play, thisAmount, perf) {
     return thisAmount;
 }
 
-function usdFomfat() {
-    const format = new Intl.NumberFormat('en-US', {
+function usdFormat(thisAmount) {
+    return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
         minimumFractionDigits: 2,
-    }).format;
-    return format;
+    }).format(thisAmount / 100);
 }
 
-function calculateCredits(invoice, plays, result, format) {
+
+
+function calculateCredits(invoice, plays, result) {
     let totalAmount = 0;
-    let volumeCredits = 0;
+    let volumeCredits = calculateVolumeCredits(invoice, plays);
     for (let perf of invoice.performances) {
         const play = plays[perf.playID];
         let thisAmount = 0;
         thisAmount = switchPlayType(play, thisAmount, perf);
-        // add volume credits
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        // add extra credit for every ten comedy attendees
-
-        if (COMEDY === play.type) volumeCredits += Math.floor(perf.audience / 5);
-        //print line for this order
-        result += ` ${play.name}: ${format(thisAmount / 100)} (${perf.audience} seats)\n`;
+        result += ` ${play.name}: ${usdFormat(thisAmount)} (${perf.audience} seats)\n`;
         totalAmount += thisAmount;
     }
     return {volumeCredits, result, totalAmount};
 }
 
+function calculateVolumeCredits(invoice, plays) {
+    let volumeCredits = 0;
+    for (let perf of invoice.performances) {
+        const play = plays[perf.playID];
+        volumeCredits += Math.max(perf.audience - 30, 0);
+        if ('comedy' === play.type) volumeCredits += Math.floor(perf.audience / 5);
+    }
+    return volumeCredits;
+}
+
+
 function printResult(invoice, plays) {
     let result = `Statement for ${invoice.customer}\n`;
-    const format = usdFomfat();
-    const ret = calculateCredits(invoice, plays, result, format);
-    ret.result += `Amount owed is ${format(ret.totalAmount / 100)}\n`;
+    const ret = calculateCredits(invoice, plays, result);
+    ret.result += `Amount owed is ${usdFormat(ret.totalAmount)}\n`;
     ret.result += `You earned ${ret.volumeCredits} credits \n`;
     return ret.result;
 }
