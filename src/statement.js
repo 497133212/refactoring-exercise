@@ -1,4 +1,5 @@
 const COMEDY = 'comedy';
+const TRAGEDY = 'tragedy';
 
 function calculateTragedyThisAmount(thisAmount, perf) {
     thisAmount = 40000;
@@ -19,7 +20,7 @@ function calculateComedyThisAmount(thisAmount, perf) {
 
 function switchPlayType(play, thisAmount, perf) {
     switch (play.type) {
-        case 'tragedy':
+        case TRAGEDY:
             thisAmount = calculateTragedyThisAmount(thisAmount, perf);
             break;
         case COMEDY:
