@@ -15,13 +15,13 @@ function calculateComedyThisAmount(thisAmount, audience) {
     return thisAmount;
 }
 
-function switchPlayType(play, thisAmount, perf) {
+function switchPlayType(play, thisAmount, performance) {
     switch (play.type) {
         case 'tragedy':
-            thisAmount = calculateTragedyThisAmount(thisAmount, perf.audience);
+            thisAmount = calculateTragedyThisAmount(thisAmount, performance.audience);
             break;
         case 'comedy':
-            thisAmount = calculateComedyThisAmount(thisAmount, perf.audience);
+            thisAmount = calculateComedyThisAmount(thisAmount, performance.audience);
             break;
         default:
             throw new Error(`unknown type: ${play.type}`);
@@ -38,16 +38,16 @@ function usdFormat(thisAmount) {
 }
 
 
-function calculateThisAmount(invoice, plays, perf) {
+function calculateThisAmount(invoice, plays, performance) {
     let thisAmount = 0;
-    thisAmount = switchPlayType(plays[perf.playID], thisAmount, perf);
+    thisAmount = switchPlayType(plays[performance.playID], thisAmount, performance);
     return thisAmount;
 }
 
 function calculateTotalAmount(invoice, plays) {
     let totalAmount = 0;
-    for (let perf of invoice.performances) {
-        let thisAmount = calculateThisAmount(invoice, plays, perf)
+    for (let performance of invoice.performances) {
+        let thisAmount = calculateThisAmount(invoice, plays, performance)
         totalAmount += thisAmount;
     }
     return totalAmount;
@@ -55,9 +55,9 @@ function calculateTotalAmount(invoice, plays) {
 
 function calculateVolumeCredits(invoice, plays) {
     let volumeCredits = 0;
-    for (let perf of invoice.performances) {
-        volumeCredits += Math.max(perf.audience - 30, 0);
-        if ('comedy' === plays[perf.playID].type) volumeCredits += Math.floor(perf.audience / 5);
+    for (let performance of invoice.performances) {
+        volumeCredits += Math.max(performance.audience - 30, 0);
+        if ('comedy' === plays[performance.playID].type) volumeCredits += Math.floor(performance.audience / 5);
     }
     return volumeCredits;
 }
@@ -65,9 +65,9 @@ function calculateVolumeCredits(invoice, plays) {
 function createStatementData(invoice, plays) {
     let data = {};
     data.customer = invoice.customer;
-    for (let perf of invoice.performances) {
-        perf.play = plays[perf.playID];
-        perf.amount = calculateThisAmount(invoice, plays, perf);
+    for (let performance of invoice.performances) {
+        performance.play = plays[performance.playID];
+        performance.amount = calculateThisAmount(invoice, plays, performance);
     }
     data.performances = invoice.performances;
     data.totalAmount = calculateTotalAmount(invoice, plays);
@@ -77,8 +77,8 @@ function createStatementData(invoice, plays) {
 
 function printResult(data) {
     let result = `Statement for ${data.customer}\n`;
-    for (let perf of data.performances) {
-        result += ` ${perf.play.name}: ${usdFormat(perf.amount)} (${perf.audience} seats)\n`;
+    for (let performance of data.performances) {
+        result += ` ${performance.play.name}: ${usdFormat(performance.amount)} (${performance.audience} seats)\n`;
     }
     result += `Amount owed is ${usdFormat(data.totalAmount)}\n`;
     result += `You earned ${data.totalVolumeCreadits} credits \n`;
@@ -89,9 +89,9 @@ function generateHtml(data) {
     let result = `<h1>Statement for ${data.customer}</h1>\n`;
     result += '<table>\n';
     result += '<tr><th>play</th><th>seats</th><th>cost</th></tr>';
-    for(let perf of data.performances) {
-        result += ` <tr><td>${perf.play.name}</td><td>${perf.audience}</td>`;
-        result += `<td>${usdFormat(perf.amount)}</td></tr>\n`;
+    for(let performance of data.performances) {
+        result += ` <tr><td>${performance.play.name}</td><td>${performance.audience}</td>`;
+        result += `<td>${usdFormat(performance.amount)}</td></tr>\n`;
     }
     result += '</table>\n';
     result += `<p>Amount owed is <em>${usdFormat(data.totalAmount)}</em></p>\n`;
